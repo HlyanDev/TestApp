@@ -3,19 +3,23 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
+    
         <div class="col-md-8">
+
+            @if (session('message'))
+                <div class="alert alert-success" role="alert">
+                    {{ session('message') }}
+                </div>
+            @endif
+    
             <div class="card">
-                    @if (session('msg'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('msg') }}
-                        </div>
-                    @endif
+            
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <p class="font-weight-bold mb-0">
                             Task Lists
                         </p>
-                        <a href="/tasks/create" class="btn btn-primary">
+                        <a href="{{ route('tasks.create') }}" class="btn btn-primary">
                             + New Task
                         </a>
                     </div>
@@ -32,29 +36,43 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>No.</th>
                                     <th>Title</th>
+                                    <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <!-- contents goes here -->
-                                @foreach($tasks as $x => $task)
+                                @forelse(Auth::user()->tasks as $task)
                                     <tr>
-                                        <td>{{ $x + 1 }}</td>
                                         <td>{{ $task->title }}</td>
-                                        <td class="d-flex justify-content-around">
-                                            <a href="/tasks/edit/{{ $task->id }}" class="btn btn-warning">Edit</a>
-                                            <a href="javascript:void(0)" onclick="document.getElementById('task_del').submit()" class="btn btn-danger">
-                                                Delete
-                                            </a>
-                                            <form action="{{ route('task_delete') }}" method="POST" id="task_del">
-                                                @csrf
-                                                <input type="hidden" name="task_id" value="{{ $task->id }}">
-                                            </form>
+                                        <td>
+                                            <span class="badge badge-{{ ($task->status) ? 'success' : 'warning' }}">
+                                                {{ ($task->status) ? 'Done' : 'Pending' }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex justify-content-around">
+                                                <a href="{{ route('tasks.show', $task->id ) }}" class="btn btn-outline-primary">Detail</a>
+                                                <a href="{{ route('tasks.edit', $task->id ) }}" class="btn btn-warning">Edit</a>
+                                                <a href="javascript:void(0)" onclick="document.getElementById('task_del').submit()" class="btn btn-danger">
+                                                    Delete
+                                                </a>
+                                                <form action="{{ route('tasks.destroy', $task->id) }}" method="POST" id="task_del">
+                                                    @csrf
+                                                    @method("DELETE")
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
-                                @endforeach
+
+                                @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center font-weight-bold text-danger">
+                                            No Records
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
 
                         </table>

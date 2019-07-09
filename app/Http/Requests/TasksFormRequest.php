@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class TaskCreateRequest extends FormRequest
+class TasksFormRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,13 +24,15 @@ class TaskCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            "title" => "required"
+            "title" => "required",
+            "status" => "required|boolean"
         ];
     }
 
     public function messages() {
         return [
-            "title.required" => "Title must be insert."
+            "title.required" => "Please fill the title input.",
+            "status.required" => "Please select one of the input."
         ];
     }
 }
